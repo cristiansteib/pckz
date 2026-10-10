@@ -1,7 +1,13 @@
 #!/bin/sh
 set -e
-# Stop running trays before their binary is replaced.
+# Stop running windows and trays before their binary is replaced (postinst
+# starts the trays again). A running `audio-switcher --update` is spared: it
+# is the process doing this upgrade.
 if [ "$1" = upgrade ] || [ "$1" = install ]; then
-    pkill -x audio-switcher 2>/dev/null || true
+    for pid in $(pgrep -x audio-switcher 2>/dev/null); do
+        if ! tr '\0' ' ' < "/proc/$pid/cmdline" 2>/dev/null | grep -q -- '--update'; then
+            kill "$pid" 2>/dev/null || true
+        fi
+    done
 fi
 exit 0
