@@ -69,7 +69,13 @@ Screenshots in `docs/screenshots` come from this setup.
 
 ## Commits and releases
 
-Use [Conventional Commits](https://www.conventionalcommits.org) (`feat:`,
-`fix:`, `docs:`, …). Each push to `main` runs CI, then semantic-release picks
-the version from the commits, runs `make dist`, and publishes a GitHub
-release with tarballs, `.deb`s and checksums. Don't edit versions by hand.
+Use [Conventional Commits](https://www.conventionalcommits.org). For now
+every change ships as a patch release: write `fix:` (or `fix(scope):`)
+commits. `.releaserc.json` also maps `feat` and breaking changes to patch.
+Each push to `main` runs CI, then semantic-release picks the version, runs
+`make dist` (with `REPO` taken from `GITHUB_REPOSITORY`, which turns on
+in-app update checks), and publishes a GitHub release with tarballs, `.deb`s
+and checksums. Don't edit versions by hand.
+
+The update flow lives in `internal/update`: `Detect` decides between mise,
+`.deb` and manual installs, and `Apply` upgrades the same way.

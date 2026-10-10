@@ -34,6 +34,8 @@ same way GNOME Settings does it, but one click away.
   automatically.
 - **Remembered configurations.** Pick a codec or profile once (say SBC-XQ or
   LDAC), and it is restored every time that device reconnects.
+- **Updates itself.** It checks for new releases and shows an *Update*
+  button, which upgrades through mise or the .deb, whichever you used.
 - **Per-app volume** and **card configuration**, in a small libadwaita
   window that follows the system light/dark style.
 
@@ -53,6 +55,9 @@ mise use -g 'github:<owner>/<repo>[matching=.tar.gz]'
 audio-switcher --install   # launcher, icons and tray at login, for your user
 ```
 
+If your mise config sets `minimum_release_age`, new releases appear after
+that delay.
+
 **As a .deb (all users):** download it from the [latest release](../../releases/latest),
 then:
 
@@ -70,6 +75,7 @@ audio-switcher --tray       tray only, which is what runs at login
 audio-switcher --list       print devices and exit
 audio-switcher --install    set up launcher, icons and autostart for this user
 audio-switcher --uninstall  remove them
+audio-switcher --update     upgrade to the latest release (--check-update to just look)
 ```
 
 ## Development

@@ -1,8 +1,11 @@
 # Version is injected by the release workflow (semantic-release).
 VERSION ?= 0.0.0-dev
+# owner/name of the GitHub repository releases are published to; enables the
+# in-app update check. GitHub Actions provides it; source builds leave it empty.
+REPO    ?= $(GITHUB_REPOSITORY)
 ARCHES  ?= amd64 arm64
 BIN      = bin/audio-switcher
-LDFLAGS  = -s -w -X main.version=$(VERSION)
+LDFLAGS  = -s -w -X main.version=$(VERSION) -X main.repo=$(REPO)
 GOBUILD  = CGO_ENABLED=0 go build -trimpath -buildvcs=false -ldflags '$(LDFLAGS)'
 
 .PHONY: build run demo test lint icons deb dist install clean

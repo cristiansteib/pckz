@@ -23,6 +23,7 @@ import (
 	"pckz/internal/audio"
 	"pckz/internal/install"
 	"pckz/internal/tray"
+	"pckz/internal/update"
 )
 
 const (
@@ -53,6 +54,10 @@ type App struct {
 
 	refreshCh chan struct{}
 	volume    coalescer
+
+	banner   *adw.Banner
+	pending  *update.Release
+	updating bool
 }
 
 // Running reports whether another instance already owns the app id, so a
@@ -113,6 +118,7 @@ func (a *App) startup() {
 	}
 	a.win.SetHideOnClose(a.tray != nil)
 
+	a.startUpdateChecks()
 	go a.refreshLoop()
 	audio.Watch(a.refresh)
 	a.refresh()
@@ -176,6 +182,9 @@ func (a *App) buildWindow() {
 	menu := gio.NewMenu()
 	menu.Append("Start in Tray at Login", "app.autostart")
 	menu.Append("Sound Settings", "app.settings")
+	if update.Enabled() {
+		menu.Append("Check for Updates", "app.check-update")
+	}
 	menu.Append("About Audio Switcher", "app.about")
 	menu.Append("Quit", "app.quit")
 	menuBtn := gtk.NewMenuButton()
@@ -187,6 +196,7 @@ func (a *App) buildWindow() {
 
 	view := adw.NewToolbarView()
 	view.AddTopBar(&header.Widget)
+	view.AddTopBar(&a.buildUpdateBanner().Widget)
 	view.SetContent(&stack.Widget)
 
 	a.toasts = adw.NewToastOverlay()
@@ -232,6 +242,7 @@ func (a *App) addActions() {
 	a.addAction("quit", nil, func(*gio.SimpleAction) { a.app.Quit() })
 	a.addAction("settings", nil, func(*gio.SimpleAction) { openSoundSettings() })
 	a.addAction("about", nil, func(*gio.SimpleAction) { a.showAbout() })
+	a.addAction("check-update", nil, func(*gio.SimpleAction) { go a.checkForUpdate(true) })
 	a.addAction("autostart", glib.NewVariantBoolean(autostartEnabled()), func(s *gio.SimpleAction) {
 		on := !autostartEnabled()
 		if err := setAutostart(on); err != nil {
@@ -459,11 +470,11 @@ func (a *App) updateTray() {
 	a.tray.SetIcon(icon)
 	a.tray.SetTooltip("Audio Switcher", tip)
 
-	items := []*tray.Item{
+	items := append(a.updateItems(), []*tray.Item{
 		{Label: "Open Audio Switcher", Icon: audio.IconApp, OnClick: func() { post(func() { a.win.Present() }) }},
 		{Separator: true},
 		{Label: "Output", Header: true},
-	}
+	}...)
 	items = append(items, a.deviceItems(s.Outputs)...)
 	items = append(items, &tray.Item{Separator: true}, &tray.Item{Label: "Input", Header: true})
 	items = append(items, a.deviceItems(s.Inputs)...)

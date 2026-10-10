@@ -38,15 +38,27 @@ func appEntry() string { return filepath.Join(dataHome(), "applications", assets
 
 func trayEntry() string { return filepath.Join(configHome(), "autostart", assets.TrayDesktopFile) }
 
-// command returns how desktop entries should start the app. A name found on
-// PATH (a mise shim, /usr/local/bin) survives upgrades; otherwise the path of
-// this executable is used.
+// command returns how desktop entries should start the app, preferring a
+// path that survives upgrades:
+//   - mise installs: the mise shim (installs live in per-version directories)
+//   - the .deb: /usr/bin/audio-switcher
+//   - otherwise: whatever is on PATH, or this executable
 func command() string {
 	exe, err := os.Executable()
 	if err != nil {
 		return "audio-switcher"
 	}
 	exe, _ = filepath.EvalSymlinks(exe)
+	if i := strings.Index(exe, "/installs/"); i > 0 && strings.Contains(exe, "/mise/") {
+		shim := filepath.Join(exe[:i], "shims", "audio-switcher")
+		if _, err := os.Stat(shim); err == nil {
+			return shim
+		}
+		return exe
+	}
+	if strings.HasPrefix(exe, "/usr/") {
+		return exe
+	}
 	if p, err := exec.LookPath("audio-switcher"); err == nil {
 		if abs, err := filepath.Abs(p); err == nil {
 			return abs
@@ -96,7 +108,8 @@ func entry(name, exec string) ([]byte, error) {
 }
 
 // Install sets the app up for the current user and reports what it did.
-func Install() error {
+// With start, the tray is launched right away instead of at next login.
+func Install(start bool) error {
 	cmd := command()
 	if err := Icons(); err != nil {
 		return err
@@ -123,7 +136,9 @@ func Install() error {
 		os.Getenv("USER"), appEntry(), trayEntry(), iconDir())
 	fmt.Printf("Starts with: %s\n", cmd)
 
-	// Start the tray now rather than at next login.
+	if !start {
+		return nil
+	}
 	tray := exec.Command(cmd, "--tray")
 	if err := tray.Start(); err == nil {
 		_ = tray.Process.Release()
