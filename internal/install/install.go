@@ -16,6 +16,7 @@ import (
 	"github.com/godbus/dbus/v5"
 
 	"pckz/assets"
+	"pckz/internal/update"
 )
 
 func dataHome() string {
@@ -51,8 +52,8 @@ func command() string {
 		return "audio-switcher"
 	}
 	exe, _ = filepath.EvalSymlinks(exe)
-	if i := strings.Index(exe, "/installs/"); i > 0 && strings.Contains(exe, "/mise/") {
-		shim := filepath.Join(exe[:i], "shims", "audio-switcher")
+	if data := update.MiseDataDir(exe); data != "" {
+		shim := filepath.Join(data, "shims", "audio-switcher")
 		if _, err := os.Stat(shim); err == nil {
 			return shim
 		}

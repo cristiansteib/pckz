@@ -137,11 +137,23 @@ func executable() string {
 	return exe
 }
 
+// MiseDataDir returns mise's data directory when exe was installed by mise:
+// mise unpacks tools to <data>/installs/<tool>/<version>/ and leaves a
+// .mise.backend.toml in <tool>. Checking for that file works with any
+// MISE_DATA_DIR, not just the default ~/.local/share/mise.
+func MiseDataDir(exe string) string {
+	tool := filepath.Dir(filepath.Dir(exe))
+	if _, err := os.Stat(filepath.Join(tool, ".mise.backend.toml")); err != nil {
+		return ""
+	}
+	return filepath.Dir(filepath.Dir(tool))
+}
+
 // Detect tells how the running binary was installed.
 func Detect() Method {
 	exe := executable()
 	switch {
-	case strings.Contains(exe, "/mise/installs/"):
+	case MiseDataDir(exe) != "":
 		return Mise
 	case strings.HasPrefix(exe, "/usr/bin/"):
 		if exec.Command("dpkg", "-S", exe).Run() == nil {
