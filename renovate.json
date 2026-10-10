@@ -1,34 +1,61 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommits"],
+  "extends": [
+    "config:recommended",
+    ":semanticCommits"
+  ],
   "timezone": "Etc/UTC",
-  "schedule": ["before 6am on monday"],
+  "schedule": [
+    "before 6am on monday"
+  ],
   "automerge": true,
   "automergeType": "pr",
   "platformAutomerge": true,
   "rangeStrategy": "bump",
-  "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"],
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths"
+  ],
   "semanticCommitType": "fix",
   "semanticCommitScope": "deps",
   "packageRules": [
     {
       "description": "Build and release tooling doesn't change the app: no release",
-      "matchManagers": ["github-actions", "mise", "custom.regex"],
+      "matchManagers": [
+        "github-actions",
+        "mise",
+        "custom.regex"
+      ],
       "semanticCommitType": "chore",
       "semanticCommitScope": "ci"
     },
     {
       "description": "One PR per week for all tooling updates",
-      "matchManagers": ["github-actions", "mise", "custom.regex"],
+      "matchManagers": [
+        "github-actions",
+        "mise",
+        "custom.regex"
+      ],
       "groupName": "build tooling"
+    },
+    {
+      "description": "conventionalcommits 10 needs conventional-changelog-writer 9, which @semantic-release/release-notes-generator doesn't use yet (it fails at release time, which CI can't catch). Lift once the plugin moves to writer 9.",
+      "matchPackageNames": [
+        "conventional-changelog-conventionalcommits"
+      ],
+      "allowedVersions": "<10"
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
       "description": "npm packages pinned in the release workflow (npx -p name@major)",
-      "managerFilePatterns": ["/^\\.github/workflows/release\\.ya?ml$/"],
-      "matchStrings": ["-p (?<depName>(?:@[a-z0-9-]+/)?[a-z0-9.-]+)@(?<currentValue>\\d+)\\s"],
+      "managerFilePatterns": [
+        "/^\\.github/workflows/release\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "-p (?<depName>(?:@[a-z0-9-]+/)?[a-z0-9.-]+)@(?<currentValue>\\d+)\\s"
+      ],
       "datasourceTemplate": "npm",
       "versioningTemplate": "npm"
     }
