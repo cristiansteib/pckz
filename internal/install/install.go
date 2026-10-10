@@ -13,6 +13,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/godbus/dbus/v5"
+
 	"pckz/assets"
 )
 
@@ -139,6 +141,10 @@ func Install(start bool) error {
 	if !start {
 		return nil
 	}
+	if running() {
+		fmt.Println("The tray is already running; it uses the new entries from the next login.")
+		return nil
+	}
 	tray := exec.Command(cmd, "--tray")
 	if err := tray.Start(); err == nil {
 		_ = tray.Process.Release()
@@ -162,6 +168,18 @@ func Uninstall() error {
 	fmt.Println("Removed the launcher, autostart entry and icons.")
 	stopOthers()
 	return nil
+}
+
+// running reports whether this user's session already has an instance.
+func running() bool {
+	conn, err := dbus.ConnectSessionBus()
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+	var has bool
+	_ = conn.BusObject().Call("org.freedesktop.DBus.NameHasOwner", 0, assets.AppID).Store(&has)
+	return has
 }
 
 // stopOthers ends this user's running instances (not this process).
