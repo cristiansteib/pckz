@@ -1,0 +1,4 @@
+# Development tools for this repo: `mise install`.
+[tools]
+go = "1.24"
+node = "22"

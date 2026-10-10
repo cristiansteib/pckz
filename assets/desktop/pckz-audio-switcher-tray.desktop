@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Audio Switcher (tray)
+Comment=Sound device switcher in the top bar
+Exec=audio-switcher --tray
+Icon=pckz-audio-switcher
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=2

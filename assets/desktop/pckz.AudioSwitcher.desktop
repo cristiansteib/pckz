@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Audio Switcher
+GenericName=Sound Device Switcher
+Comment=Switch between speakers, monitors, headsets and microphones
+Exec=audio-switcher
+Icon=pckz-audio-switcher
+Terminal=false
+Categories=AudioVideo;Audio;Mixer;
+Keywords=audio;sound;output;input;speaker;headphones;headset;bluetooth;hdmi;monitor;microphone;pulseaudio;pipewire;
+StartupNotify=true
+StartupWMClass=pckz.AudioSwitcher

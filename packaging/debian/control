@@ -1,0 +1,18 @@
+Package: pckz-audio-switcher
+Version: @VERSION@
+Architecture: @ARCH@
+Maintainer: pckz contributors <maintainers@pckz.invalid>
+Section: sound
+Priority: optional
+Depends: libgtk-4-1 (>= 4.14), libadwaita-1-0 (>= 1.7), pulseaudio-utils
+Recommends: gnome-shell-extension-appindicator, bluez
+Description: Sound device switcher for the tray, PulseAudio and PipeWire
+ Switch the default output and input from the top bar or a small window,
+ exactly like GNOME Settings does (card profiles and ports included):
+ HDMI/DisplayPort monitors by name, Bluetooth speakers and headsets
+ (connecting paired ones on click), USB headsets, webcams, S/PDIF, and
+ virtual devices — each with its own icon. Includes per-device volume,
+ card configuration and per-application volume.
+ .
+ The tray starts automatically for every user; on GNOME it needs the
+ AppIndicator extension (enabled by default on Ubuntu).

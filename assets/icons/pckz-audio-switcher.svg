@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#62a0ea"/>
+      <stop offset="1" stop-color="#813d9c"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="10" width="112" height="112" rx="28" fill="#000" opacity=".18"/>
+  <rect x="8" y="6" width="112" height="112" rx="28" fill="url(#bg)"/>
+  <rect x="8" y="6" width="112" height="56" rx="28" fill="url(#shine)"/>
+  <g transform="translate(22 20) scale(5.25)">
+    <path fill="#fff" fill-rule="evenodd" d="M0.75 5.75L3 5.75L6.25 2.75L6.25 13.25L3 10.25L0.75 10.25z"/>
+    <path fill="#fff" fill-rule="evenodd" d="M8.75 5.75L13 5.75A0.75 0.75 0 0 1 13 4.25L8.75 4.25A0.75 0.75 0 0 1 8.75 5.75z"/>
+    <path fill="#fff" fill-rule="evenodd" d="M12 2.25L15.5 5L12 7.75z"/>
+    <path fill="#fff" fill-rule="evenodd" d="M11.5 11.75L15.25 11.75A0.75 0.75 0 0 1 15.25 10.25L11.5 10.25A0.75 0.75 0 0 1 11.5 11.75z"/>
+    <path fill="#fff" fill-rule="evenodd" d="M12.5 8.25L9 11L12.5 13.75z"/>
+  </g>
+</svg>

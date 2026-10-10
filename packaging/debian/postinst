@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+if [ "$1" != configure ]; then
+    exit 0
+fi
+
+gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor 2>/dev/null || true
+update-desktop-database -q /usr/share/applications 2>/dev/null || true
+
+# New logins start the tray through /etc/xdg/autostart. Also start it now for
+# everyone who already has a graphical session, so nobody has to log out.
+started=" "
+for s in $(loginctl list-sessions --no-legend 2>/dev/null | awk '{print $1}'); do
+    type=$(loginctl show-session "$s" -p Type --value 2>/dev/null) || continue
+    case "$type" in wayland|x11) ;; *) continue ;; esac
+    uid=$(loginctl show-session "$s" -p User --value 2>/dev/null) || continue
+    case "$started" in *" $uid "*) continue ;; esac
+    started="$started$uid "
+    user=$(id -nu "$uid" 2>/dev/null) || continue
+    home=$(getent passwd "$user" | cut -d: -f6)
+    if grep -qs '^Hidden=true' "$home/.config/autostart/pckz-audio-switcher-tray.desktop"; then
+        continue # this user turned the tray off
+    fi
+    systemd-run --user --machine="$user@.host" --quiet --collect \
+        --unit="pckz-audio-switcher-tray-$$" /usr/bin/audio-switcher --tray \
+        >/dev/null 2>&1 || true
+done
+
+echo "Audio Switcher installed: it is in the top bar, and in the app grid as \"Audio Switcher\"."
+exit 0
